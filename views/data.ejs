@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Gamry</title>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+			<link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/offcanvas/">
+	<link rel="stylesheet" href="./css/main.css">
+	<style>
+	.table{
+	   display: block !important;
+	   overflow-x: auto !important;
+	   width: 100% !important;
+	 }
+	 body {
+	  /* Set "my-sec-counter" to 0 */
+	  counter-reset: my-sec-counter;
+		height: 100%;
+		font-family: ;/*courier garamond candara*/
+		color: black;
+	}
+  .fa {
+  padding: 20px;
+  font-size: 24px;
+  width: ;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 50%;
+  color: black;
+}
+	#navbarColor {
+		background-attachment: fixed;
+		background: -webkit-gradient(linear, left top, right top, from(#7b4397), to(#dc2430)) fixed;
+}
+.wrapper {
+  padding-top: 60px;
+	width: 100%;
+	background-color: ;
+	height: 50%
+}
+
+.main-container {
+  background: ;
+  position: relative;
+  color: #FFFFFF;
+}
+
+.main-container:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -36px;
+  width: 100%;
+  height: 72px;
+  background: black;
+  -webkit-transform: skewY(2.5deg);
+  -moz-transform: skewY(2.5deg);
+  -ms-transform: skewY(2.5deg);
+  -o-transform: skewY(2.5deg);
+  transform: skewY(2.5deg);
+  -webkit-backface-visibility: hidden;
+}
+
+section {
+  margin: 10px 0;
+  padding: 0 20px;
+  padding-bottom: 10px;
+  position: relative;
+}
+#slant {
+  position: relative;
+  display: inline-block;
+  padding: 1em 5em 1em 1em;
+  overflow: hidden;
+  color: #fff;
+}
+
+#slant:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  -webkit-transform-origin: 100% 0;
+  -ms-transform-origin: 100% 0;
+  transform-origin: 100% 0;
+  -webkit-transform: skew(-45deg);
+  -ms-transform: skew(-45deg);
+  transform: skew(-45deg);
+  z-index: -1;
+}
+	</style>
+</head>
+<nav id = "navbarColo" class="navbar navbar-expand-lg navbar-light  navbar-fixed">
+  <a class="navbar-brand" href="#" style="font-family: garamond; border-bottom: medium solid black "><strong>Game</strong>ry</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item active">
+				<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/scoreboard">Leaderboards</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/library">Library</a>
+			</li>
+		</ul>
+    <span class="navbar-text">
+      <a href="/logout" class="fa fa-user"></a>
+    </span>
+  </div>
+</nav>
+<div class="container">
+		<div class="col-sm-12">
+			<h2 style="font-family: garamond;">Profile</h2>
+			<hr>
+		</div>
+	</div>
+	<div class="container">
+
+
+
+
+
+
+
+
+		        <!-- Profile widget -->
+		        <div class="bg-white shadow rounded overflow-hidden">
+		            <div class="px-4 pt-0 pb-4 bg-dark">
+									<div class="row" style="color: white">
+										<div class="col-sm-4">
+											<div><i class="fa fa-user" style="color: white"></i>Username: <em><%= userData.username %></em></div>
+									</div>
+									<div class="col-sm-4">
+										<div><i class="fa fa-envelope" style="color: white"></i>Email: <em><%= userData.email %></em></div>
+									</div>
+									<div class="col-sm-4">
+										<div><i class="fa fa-map-marker" style="color: white"></i>Location:
+											<%= typeof scoreData != 'undefined' ? '' : 'No Data' %></div>
+									</div>
+		            </div>
+							</div>
+						</div>
+
+		            <div class="bg-light p-4 d-flex justify-content-end text-center">
+		              	<div> <button class="btn btn-outline-dark"><a href="/2048" style="color: black"><strong>Go to today's game</strong></a></button></div>
+		            </div>
+
+		            <div class="py-4 px-4">
+		                <div class="d-flex align-items-center justify-content-between mb-3">
+		                    <h5 class="mb-0">Recent Scores</h5><a href="#" class="btn btn-link text-muted">Show all</a>
+		                </div>
+		                <div class="row">
+											<div class="container center">
+										<h2>Previous Scores</h2>
+										<div class="col-sm-12">
+										<table class="table col-sm-12"><!--table-striped   -light-->
+											 <thead class="thead">
+														<th class="col-sm-2">Game</th>
+														<th class="col-sm-2">Score</th>
+														<th class="col-sm-2">Date</th>
+														<th class="col-sm-2">Rank</th>
+											 </thead>
+											 <tbody style="width: 100%">
+																				 <% scoreData.forEach(function(data) { %>
+																					 <tr class="col-sm-2">
+																							<td><%= data.game.game_name %></td>
+																							<td><%= data.score %></td>
+																							<td><%= data.created.getMonth()%>/<%= data.created.getDate() %></td>
+																							<td><%= data.score %></td>
+																						</tr>
+																					<% }); %>
+											 </tbody>
+										</table>
+										</div>
+		                </div>
+		                <div class="py-4">
+		                    <h5 class="mb-3">Recent posts</h5>
+		                    <div class="p-4 bg-light rounded shadow-sm">
+		                        <p class="font-italic mb-0">Thanks for becoming a member! We'll have new content for you. Feel free to access the game library and share with friends</p>
+		                        <ul class="list-inline small text-muted mt-3 mb-0">
+		                            <li class="list-inline-item">- Joshua Richard <em>Co-Founder, CEO</em></li>
+		                        </ul>
+		                    </div>
+		                </div>
+		            </div>
+		 </div>
+		 <footer class="page-footer font-small cyan darken-3">
+
+	 		<!-- Footer Elements -->
+	 		<div class="container">
+
+	 			<!-- Grid row-->
+	 			<div class="row">
+
+	 				<!-- Grid column -->
+	 				<div class="col-md-12 ">
+	 					<div class="col-sm-3 mx-auto">
+	 						<a href="#" class="fa fa-facebook"></a>
+	 						<a href="#" class="fa fa-twitter"></a>
+	 						<a href="#" class="fa fa-instagram"></a>
+	 					</div>
+	 				</div>
+	 				<!-- Grid column -->
+
+	 			</div>
+	 			<!-- Grid row-->
+
+	 		</div>
+	 		<!-- Footer Elements -->
+
+	 		<!-- Copyright -->
+	 		<div class="footer-copyright text-center py-3">© 2020 Copyright:
+	 			<a href="https://mdbootstrap.com/" style="color: black"><strong>gamery.com</strong></a>
+	 		</div>
+	 		<!-- Copyright -->
+
+	 	</footer>
+	 	<!-- Footer -->
+
+
+
+
+		<center>
+</body>
+</html>

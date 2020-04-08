@@ -1,0 +1,1623 @@
+var myGamePiece;
+var myObstacles = [];
+var myScore;
+
+function startGame() {
+    myGamePiece = new component(30, 30, "red", 10, 120);
+    myGamePiece.gravity = 0.05;
+    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 480;//window.innerWidth;//480;
+        this.canvas.height = 270;//window.innerHeight;//270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    this.score = 0;
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.x = x;
+    this.y = y;
+    this.gravity = 0;
+    this.gravitySpeed = 0;
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        this.gravitySpeed += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY + this.gravitySpeed;
+        this.hitBottom();
+    }
+    this.hitBottom = function() {
+        var rockbottom = myGameArea.canvas.height - this.height;
+        if (this.y > rockbottom) {
+            this.y = rockbottom;
+            this.gravitySpeed = 0;
+        }
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+var finalWord = true;
+if(finalWord){
+function updateGameArea() {
+    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+    for (i = 0; i < myObstacles.length; i += 1) {
+			console.log("blah");
+        if (myGamePiece.crashWith(myObstacles[i])) {
+					finalWord = false;
+					i = myObstacles.length;
+					//var block = "<div class='form-group'><form id='form1' action='/submitScore'method='post'><input type='hidden' name='location' value='' required='' class='form-control'><br/><input type='hidden' name='score' value='"+myGameArea.frameNo+"' required='' class='form-control'><br/><input type='submit' value='Register' class='btn btn-success'></form></div>"
+					document.getElementById("demo").innerHTML = "<h1>Your Score was: " + myGameArea.frameNo + ", Congratulations!</h1>";
+          return;
+        }
+    }
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(150)) {
+        x = myGameArea.canvas.width;
+        minHeight = 20;
+        maxHeight = 200;
+        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+        minGap = 50;
+        maxGap = 200;
+        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+        myObstacles.push(new component(10, height, "green", x, 0));
+        myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
+    }
+    for (i = 0; i < myObstacles.length; i += 1) {
+        myObstacles[i].x += -1;
+        myObstacles[i].update();
+    }
+    myScore.text="SCORE: " + myGameArea.frameNo;
+    myScore.update();
+    myGamePiece.newPos();
+    myGamePiece.update();
+}
+}
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+function accelerate(n) {
+    myGamePiece.gravity = n;
+}
+
+
+$(document).ready(function(){
+
+	$( "#form2" ).submit(function(event) {
+		event.preventDefault();
+
+		$.ajax({
+			type: 'POST',
+			url: '/submitScore',
+			data: $('#form2').serialize(),
+			dataType: "json",
+			success: function(response){
+				//alert("a");
+				//console.log(response.Success);
+				$('#form2')[0].reset();
+
+				document.getElementById("check").innerHTML=response.Success;
+							//ADD THIS CODE
+							setTimeout(function(){
+								document.getElementById("check").innerHTML="";
+							},3000);
+							if (response.Success=="You are regestered,You can login now.") {
+								document.getElementById("aa").click();
+							};
+						},
+						error: function() {
+							console.log("heck no");
+						}
+					})
+	});
+});
+</script>
+<script async defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDicVjDmUV4IvUFNHTdVWbIGnnp1BQSJQQ&callback=initMap">
+	</script>
+
+
+  Scores.find({}, function(err,obj) { console.log(obj);
+      return res.render('scoreboard.ejs', {obj});
+       });
+
+
+
+
+
+
+       		function getLocation() {
+       		  if (navigator.geolocation) {
+       		    navigator.geolocation.getCurrentPosition(showPosition);
+       		  } else {
+       		    x.innerHTML = "Geolocation is not supported by this browser.";
+       		  }
+       		}
+
+       		function showPosition(position) {
+       				getReverseGeocodingData(position.coords.latitude, position.coords.longitude);
+       		}
+
+       		function getReverseGeocodingData(lat, lng) {
+       		    var latlng = new google.maps.LatLng(lat, lng);
+       		    // This is making the Geocode request
+       		    var geocoder = new google.maps.Geocoder();
+       		    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+       		        if (status !== google.maps.GeocoderStatus.OK) {
+       		            alert(status);
+       		        }
+       		        // This is checking to see if the Geoeode Status is OK before proceeding
+       		        if (status == google.maps.GeocoderStatus.OK) {
+       		            console.log(results);
+       		            var address = (results[0].formatted_address);
+       								var userLocation = document.getElementById("loc");
+       								userLocation.value = address;
+       		        }
+       		    });
+       		}
+
+
+
+
+
+
+
+          <footer class="page-footer font-small cyan darken-3">
+
+            <!-- Footer Elements -->
+            <div class="container">
+
+              <!-- Grid row-->
+              <div class="row">
+
+                <!-- Grid column -->
+                <div class="col-md-12 ">
+                  <div class="col-sm-3 mx-auto">
+                    <a href="#" class="fa fa-facebook"></a>
+                    <a href="#" class="fa fa-twitter"></a>
+                    <a href="#" class="fa fa-instagram"></a>
+                  </div>
+                </div>
+                <!-- Grid column -->
+
+              </div>
+              <!-- Grid row-->
+
+            </div>
+            <!-- Footer Elements -->
+
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2020 Copyright:
+              <a href="https://mdbootstrap.com/"> MDBootstrap.com</a>
+            </div>
+            <!-- Copyright -->
+
+          </footer>
+          <!-- Footer -->
+
+
+
+
+          <div class="container center">
+          <div class="row">
+          	<div class="col-sm-3">
+          		<button href="/register"style="width: 100%; height: 100%; color: black" type="button" class="btn btn-outline-light text-dark"><a href="/register"><span style="color: black">Make an Account</span></a></button>
+          		<div class="card" style="width: 18rem;">
+          			<div class="card-body" style="height: 10%">
+          					<button href="/register"style="width: 100%; height: 100%; color: black" type="button" class="btn btn-outline-light text-dark"><a href="/register"><span style="color: black">Make an Account</span></a></button>
+          </div>
+          </div>
+          </div>
+          	<div class="col-sm-3">
+          		<button style="width: 100%; height: 100%; color: black" type="button" class="btn btn-outline-light text-dark"><a href="/login"><span style="color: black">Login</span></a></button>
+          		<div class="card" style="width: 18rem;">
+          		</div>
+          	</div>
+          	<div class="col-sm-3">
+          		<button style="width: 100%; height: 100%; color: black" type="button" class="btn btn-outline-light text-dark"><a href="/guest"><span style="color: black">Continue as Guest</span></a></button>
+          		<div class="card" style="width: 18rem;">
+          		</div>
+          	</div>
+          </div>
+          </div>
+
+
+
+
+
+
+
+
+
+          <div class="wrapper">
+
+            <main class="main">
+              <div class="main-container">
+                <section>
+          				<div class="jumbotron text-center" style="margin-bottom:0; background-color: transparent;">
+          				  <h1 style="font-weight: 300; color: ; font-size: 48px;"><strong style="font-weight: bold">Game</strong>ry</h1><!--<strong style="font-weight: bold"><span class="text-primary">G</span><span class="text-warning">a</span><span class="text-success">m</span><span class="text-danger">e</span></strong>ry</h1>-->
+          				  <p style="color: ; font-weight: 400;"></p>
+          				</div>
+
+                  </section>
+              </div>
+             </main>
+
+          </div>
+          <div class="container" style="margin-top: 3%;">
+          	<div class="col-sm-12">
+          		<div class="row">
+
+
+              <div class="col-sm-3 card bg- shadow-sm p-3 mb-5 rounded thumbnail">
+                <div class="card-body text-center">
+                  <p class="card-text">Create an Account</p>
+                </div>
+              </div>
+          		<span class="col-sm-1">
+          		</span>
+              <div class="col-sm-3 card bg- shadow-sm p-3 mb-5 rounded thumbnail">
+                <div class="card-body text-center">
+                  <p class="card-text">Login</p>
+                </div>
+              </div>
+          		<span class="col-sm-1">
+          		</span>
+              <div class="col-sm-3 card bg- shadow-sm p-3 mb-5 rounded thumbnail">
+                <div class="card-body text-center">
+                  <p class="card-text">Play as Guest</p>
+                </div>
+              </div>
+              </div>
+
+
+          	</div>
+          	</div>
+
+            </div>
+          </body>
+          </html>
+
+
+
+          <table class="table">
+          	<thead>
+          		<tr>
+          			<th>Game</th>
+          			<th>Score</th>
+          			<th>Date</th>
+          		</tr>
+          	</thead>
+          	<tbody>
+          		 <% scoreData.forEach(function(data) { %>
+          			 <tr>
+          					<td><%= data.game.game_name %></td>
+          					<td><%= data.score %></td>
+          					<td><%= data.created.getMonth()%>/<%= data.created.getDate() %></td>
+          				</tr>
+          			<% }); %>
+          	</tbody>
+          </table>
+          </div>
+
+
+
+
+
+          /nav>
+
+          <div class="wrapper">
+
+            <main class="main">
+              <div class="main-container">
+                <section>
+          				<div class="jumbotron text-center" style="margin-bottom:0; background-color: transparent;">
+          				  <h1 style="font-weight: 300; color: ; font-size: 48px;"><strong style="font-weight: bold">Game</strong>ry</h1><!--<strong style="font-weight: bold"><span class="text-primary">G</span><span class="text-warning">a</span><span class="text-success">m</span><span class="text-danger">e</span></strong>ry</h1>-->
+          				  <p style="color: ; font-weight: 400;"></p>
+          				</div>
+
+
+                  </section>
+              </div>
+             </main>
+
+          </div>
+
+
+          body {
+    background: #654ea3;
+    background: -webkit-linear-gradient(to right, #654ea3, #eaafc8);
+    background: linear-gradient(to right, #654ea3, #eaafc8);
+    min-height: 100vh;
+}
+
+
+
+
+
+var userCity = document.getElementById("userCity");
+userCity.value = country.short_name;
+var userState = document.getElementById("userState");
+userState.value = country.short_name;
+var userCountry = document.getElementById("userCountry");
+userCountry.value = country.short_name;
+
+
+
+
+
+  // Update the actuator
+  this.actuate();
+};
+
+// Set up the initial tiles to start the game with
+GameManager.prototype.addStartTiles = function () {
+  for (var i = 0; i < this.startTiles; i++) {
+    this.addRandomTile();
+  }
+};
+
+// Adds a tile in a random position
+GameManager.prototype.addRandomTile = function () {
+  if (this.grid.cellsAvailable()) {
+    var value = Math.random() < 0.9 ? 2 : 4;
+    var tile = new Tile(this.grid.randomAvailableCell(), value);
+
+    this.grid.insertTile(tile);
+  }
+};
+
+// Sends the updated grid to the actuator
+GameManager.prototype.actuate = function () {
+  if (this.storageManager.getBestScore() < this.score) {
+    this.storageManager.setBestScore(this.score);
+  }
+
+  // Clear the state when the game is over (game over only, not win)
+  if (this.over) {
+    var city = "";
+    var state = "";
+    var country = "";
+    var name = "";
+
+            getLocation();
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+
+    function showPosition(position) {
+        getReverseGeocodingData(position.coords.latitude, position.coords.longitude);
+    }
+
+    function getReverseGeocodingData(lat, lng) {
+      geocoder = new google.maps.Geocoder();
+      var latlng = new google.maps.LatLng(lat, lng);
+          geocoder.geocode({'latLng': latlng}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+            //console.log(results);
+              if (results[1]) {
+              var indice=0;
+              for (var j=0; j<results.length; j++)
+              {
+                  if (results[j].types[0]=='locality')
+                      {
+                          indice=j;
+                          break;
+                      }
+                  }
+              //alert('The good number is: '+j);
+              console.log(results[indice]);
+              for (var i=0; i<results[indice].address_components.length; i++)
+                  {
+                      if (results[indice].address_components[i].types[0] == "locality") {
+                              //this is the object you are looking for City
+                              city = results[indice].address_components[i];
+                          }
+                      if (results[indice].address_components[i].types[0] == "administrative_area_level_1") {
+                              //this is the object you are looking for State
+                              region = results[indice].address_components[i];
+                          }
+                      if (results[indice].address_components[i].types[0] == "country") {
+                              //this is the object you are looking for
+                              country = results[indice].address_components[i];
+                          }
+                  }
+
+                  //city data
+                  //alert(city.long_name + " || " + region.long_name + " || " + country.short_name)
+                  city = city.long_name;
+
+                  state = region.long_name;
+
+                  country = country.short_name;
+                  name = "jon";
+
+
+                  } else {
+                    alert("No results found");
+                  }
+              //}
+            } else {
+              alert("Geocoder failed due to: " + status);
+            }
+          });
+        }
+
+
+
+
+
+
+
+        router.get('/profile', function (req, res, next) {
+        	console.log("profile");
+        	var blob = {};
+        	User.findOne({unique_id:req.session.userId},function(err, userData){
+        		if(!userData){
+        			res.redirect('/');
+        		}else{
+        			blob = {userData};
+        		}
+        });
+        Scores.find({unique_id: req.session.userId}).sort('-score')  // give me the max
+          .exec(function (err, scoreData) {
+        		if(err){
+        			console.log(err);
+        		}
+            // your callback code
+        //console.log(userData);
+        if(!scoreData){
+        	//res.redirect('/');
+        }else{
+        	var newBlob = {blob, scoreData};
+        	return res.render('data.ejs', {"scoreData": newBlob.scoreData, "userData": newBlob.blob.userData});
+        }
+        });
+        });
+
+
+
+
+
+        router.get('/profile', function (req, res, next) {
+        	console.log("profile");
+        	var blob = {};
+        	User.findOne({unique_id:req.session.userId},function(err, userData){
+        		if(!userData){
+        			res.redirect('/');
+        		}else{
+        			blob = {userData};
+        		}
+        });
+        Scores.find({unique_id: req.session.userId}).sort('-score')  // give me the max
+          .exec(function (err, scoreData) {
+        		if(err){
+        			console.log(err);
+        		}
+            // your callback code
+        //console.log(userData);
+        if(!scoreData){
+        	//res.redirect('/');
+        }else{
+        	var newBlob = {blob, scoreData};
+        	return res.render('data.ejs', {"scoreData": newBlob.scoreData, "userData": newBlob.blob.userData});
+        }
+        });
+        });
+
+
+
+        DOCTYPE html>
+        <html>
+        <head>
+        	<title>Gamry</title>
+        	<meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        			<link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/offcanvas/">
+        	<link rel="stylesheet" href="./css/main.css">
+        	<style>
+        	.table{
+        	   display: block !important;
+        	   overflow-x: auto !important;
+        	   width: 100% !important;
+        	 }
+        	 body {
+        	  /* Set "my-sec-counter" to 0 */
+        	  counter-reset: my-sec-counter;
+        		height: 100%;
+        		font-family: ;/*courier garamond candara*/
+        		color: black;
+        	}
+          .fa {
+          padding: 20px;
+          font-size: 24px;
+          width: ;
+          text-align: center;
+          text-decoration: none;
+          border-radius: 50%;
+          color: black;
+        }
+        	#navbarColor {
+        		background-attachment: fixed;
+        		background: -webkit-gradient(linear, left top, right top, from(#7b4397), to(#dc2430)) fixed;
+        }
+        .wrapper {
+          padding-top: 60px;
+        	width: 100%;
+        	background-color: ;
+        	height: 50%
+        }
+
+        .main-container {
+          background: ;
+          position: relative;
+          color: #FFFFFF;
+        }
+
+        .main-container:before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: -36px;
+          width: 100%;
+          height: 72px;
+          background: black;
+          -webkit-transform: skewY(2.5deg);
+          -moz-transform: skewY(2.5deg);
+          -ms-transform: skewY(2.5deg);
+          -o-transform: skewY(2.5deg);
+          transform: skewY(2.5deg);
+          -webkit-backface-visibility: hidden;
+        }
+
+        section {
+          margin: 10px 0;
+          padding: 0 20px;
+          padding-bottom: 10px;
+          position: relative;
+        }
+        #slant {
+          position: relative;
+          display: inline-block;
+          padding: 1em 5em 1em 1em;
+          overflow: hidden;
+          color: #fff;
+        }
+
+        #slant:after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #000;
+          -webkit-transform-origin: 100% 0;
+          -ms-transform-origin: 100% 0;
+          transform-origin: 100% 0;
+          -webkit-transform: skew(-45deg);
+          -ms-transform: skew(-45deg);
+          transform: skew(-45deg);
+          z-index: -1;
+        }
+        	</style>
+        </head>
+        <nav id = "navbarColo" class="navbar navbar-expand-lg navbar-light  navbar-fixed">
+          <a class="navbar-brand" href="#" style="font-family: garamond; border-bottom: medium solid black "><strong>Game</strong>ry</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarText">
+        		<ul class="navbar-nav mr-auto">
+        			<li class="nav-item active">
+        				<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        			</li>
+        			<li class="nav-item">
+        				<a class="nav-link" href="/scoreboard">Leaderboards</a>
+        			</li>
+        			<li class="nav-item">
+        				<a class="nav-link" href="/library">Library</a>
+        			</li>
+        		</ul>
+            <span class="navbar-text">
+              <a href="/logout" class="fa fa-user"></a>
+            </span>
+          </div>
+        </nav>
+        <div class="container">
+        		<div class="col-sm-12">
+        			<h2 style="font-family: garamond;">Profile</h2>
+        			<hr>
+        		</div>
+        	</div>
+        	<div class="container">
+
+
+
+
+
+
+
+
+        		        <!-- Profile widget -->
+        		        <div class="bg-white shadow rounded overflow-hidden">
+        		            <div class="px-4 pt-0 pb-4 bg-dark">
+        									<div class="row" style="color: white">
+        										<div class="col-sm-4">
+        											<div><i class="fa fa-user" style="color: white"></i>Username: <%= userData.username %></div>
+        									</div>
+        									<div class="col-sm-4">
+        										<div><i class="fa fa-envelope" style="color: white"></i>Email: <%= userData.email %></div>
+        									</div>
+        									<div class="col-sm-4">
+        										<div><i class="fa fa-map-marker" style="color: white"></i>Location:
+        											<%= typeof scoreData != 'undefined' ? scoreData[0].location.city : '' %></div>
+        									</div>
+        		            </div>
+        							</div>
+        						</div>
+
+        		            <div class="bg-light p-4 d-flex justify-content-end text-center">
+        		              	<div> <button class="btn btn-outline-dark"><a href="/2048" style="color: black"><strong>Go to today's game</strong></a></button></div>
+        		            </div>
+
+        		            <div class="py-4 px-4">
+        		                <div class="d-flex align-items-center justify-content-between mb-3">
+        		                    <h5 class="mb-0">Recent Scores</h5><a href="#" class="btn btn-link text-muted">Show all</a>
+        		                </div>
+        		                <div class="row">
+        											<div class="container center">
+        										<h2>Previous Scores</h2>
+        										<div class="col-sm-12">
+        										<table class="table col-sm-12"><!--table-striped   -light-->
+        											 <thead class="thead">
+        														<th class="col-sm-2">Game</th>
+        														<th class="col-sm-2">Score</th>
+        														<th class="col-sm-2">Date</th>
+        														<th class="col-sm-2">Rank</th>
+        											 </thead>
+        											 <tbody style="width: 100%">
+
+        											 </tbody>
+        										</table>
+        										</div>
+        		                </div>
+        		                <div class="py-4">
+        		                    <h5 class="mb-3">Recent posts</h5>
+        		                    <div class="p-4 bg-light rounded shadow-sm">
+        		                        <p class="font-italic mb-0">Thanks for becoming a member! We'll have new content for you. Feel free to access the game library and share with friends</p>
+        		                        <ul class="list-inline small text-muted mt-3 mb-0">
+        		                            <li class="list-inline-item">- Joshua Richard <em>Co-Founder, CEO</em></li>
+        		                        </ul>
+        		                    </div>
+        		                </div>
+
+
+
+
+
+                            var mongoose = require('mongoose');
+                            var express = require('express');
+                            var path = require('path');
+
+                            var router = express.Router();
+
+                            var User = require('../models/user');
+                            var Scores = require('../models/score');
+                            var Guests = require('../models/guest');
+
+                            router.get('/', function (req, res, next) {
+                            	return res.render('landing.ejs');
+                            });
+
+                            router.post('/', function (req, res, next) {
+                            	//console.log(req.body);
+                            	User.findOne({email:req.body.email},function(err,data){
+                            		if(data){
+
+                            			if(data.password==req.body.password){
+                            				//console.log("Done Login");
+                            				req.session.userId = data.unique_id;
+                            				//console.log(req.session.userId);
+                            				res.send({"Success":"Success!"});
+
+                            			}else{
+                            				res.send({"Success":"Wrong password!"});
+                            			}
+                            		}else{
+                            			console.log("yikes");
+                            			res.send({"Success":"This Email Is not regestered!"});
+                            		}
+                            	});
+                            });
+                            router.get('/register', function (req, res, next) {
+                            	return res.render('index.ejs');
+                            });
+
+
+                            router.post('/register', function(req, res, next) {
+                            	var personInfo = req.body;
+
+
+                            	if(!personInfo.email || !personInfo.username || !personInfo.password || !personInfo.phone){
+                            		res.send();
+                            	} else {
+                            		if (personInfo.password) {
+
+                            			User.findOne({email:personInfo.email},function(err,data){
+                            				if(!data){
+                            					var c;
+                            					User.findOne({},function(err,data){
+
+                            						if (data) {
+                            							console.log("if");
+                            							c = data.unique_id + 1;
+                            						}else{
+                            							c=1;
+                            						}
+
+                            						var newPerson = new User({
+                            							unique_id:c,
+                            							email:personInfo.email,
+                            							username: personInfo.username,
+                            							password: personInfo.password,
+                            							phone: personInfo.phone
+                            						});
+
+                            						newPerson.save(function(err, Person){
+                            							if(err)
+                            								console.log(err);
+                            							else
+                            								console.log('Success');
+                            						});
+
+                            					}).sort({_id: -1}).limit(1);
+                            					res.send({"Success":"You are regestered,You can login now."});
+                            				}else{
+                            					res.send({"Success":"Email is already used."});
+                            				}
+
+                            			});
+                            		}else{
+                            			res.send({"Success":"password is not matched"});
+                            		}
+                            	}
+                            });
+
+                            router.get('/login', function (req, res, next) {
+                            	return res.render('login.ejs');
+                            });
+
+                            router.post('/login', function (req, res, next) {
+                            	//console.log(req.body);
+                            	User.findOne({email:req.body.email},function(err,data){
+                            		if(data){
+
+                            			if(data.password==req.body.password){
+                            				//console.log("Done Login");
+                            				req.session.userId = data.unique_id;
+                            				//console.log(req.session.userId);
+                            				res.send({"Success":"Success!"});
+
+                            			}else{
+                            				res.send({"Success":"Wrong password!"});
+                            			}
+                            		}else{
+                            			res.send({"Success":"This Email Is not regestered!"});
+                            		}
+                            	});
+                            });
+
+                            router.get('/guest', function (req, res, next) {
+                            	return res.render('guest.ejs');
+                            });
+
+                            router.post('/guest', function(req, res, next) {
+                            	var guestInfo = req.body;
+
+                            	if(!guestInfo.guest){
+                            		res.send();
+                            	} else {
+
+                            			Guests.findOne({username:guestInfo.guest},function(err,data){
+                            				console.log(" " + guestInfo.guest)
+                            				if(!data){
+
+                            						var random_id           = '';
+                            				    var characters       = '0123456789';//'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                            				    var charactersLength = characters.length;
+                            				    for ( var i = 0; i < 15; i++ ) {
+                            				       random_id += characters.charAt(Math.floor(Math.random() * charactersLength));
+                            				    }
+
+                            						var newGuest = new Guests({
+                            							unique_id: random_id,
+                            							username: guestInfo.guest
+                            						});
+                            						newGuest.save(function(err, Person){
+                            							if(err)
+                            								console.log(err);
+                            							else
+                            							req.session.userId = newGuest.unique_id;
+                            								console.log('New Guest: ' + guestInfo.guest);
+                            								//return res.redirect('/2048');
+                            						});
+
+                            					res.send({"Success":"Success!"});
+                            				}else{
+                            					res.send({"Success":"There is already an account with that name."});
+                            				}
+
+                            			});
+                            	}
+                            });
+
+                            router.get('/profile', function (req, res, next) {
+                            	console.log("profile");
+                            	var blob = {};
+                            	User.findOne({unique_id:req.session.userId},function(err, userData){
+                            		if(!userData){
+                            			res.redirect('/');
+                            		}else{
+                            			blob = {userData};
+                            		}
+                            });
+                            Scores.find({unique_id: req.session.userId}).sort('-score')  // give me the max
+                            	.exec(function (err, scoreData) {
+                            		if(err){
+                            			console.log(err);
+                            		}
+                            		// your callback code
+                            //console.log(userData);
+                            if(!scoreData){
+                            	//res.redirect('/');
+                            }else{
+                            	var newBlob = {blob, scoreData};
+
+                            	function isEmpty(scoreData) {
+                            	  for(var prop in scoreData) {
+                            	    if(scoreData.hasOwnProperty(prop)) {
+                            	      return false;
+                            	    }
+                            	  }
+                            		return true;
+                            	}
+                            	var list;
+                            	if(isEmpty(scoreData)){
+                            		list = 'No Data';
+                            	}else{
+                            		list = "<% scoreData.forEach(function(data) { %><tr class='col-sm-2'><td><%= data.game.game_name %></td><td><%= data.score %></td><td><%= data.created.getMonth()%>/<%= data.created.getDate() %></td><td><%= data.score %></td></tr><% }); %>";
+                            	}
+                            	console.log(list);
+                            	return res.render('data.ejs', {"scoreData": newBlob.scoreData, "userData": newBlob.blob.userData, 'list': list});
+                            }
+                            });
+                            });
+
+                            router.get('/logout', function (req, res, next) {
+                            	console.log("logout")
+                            	if (req.session) {
+                                // delete session object
+                                req.session.destroy(function (err) {
+                                	if (err) {
+                                		return next(err);
+                                	} else {
+                                		return res.redirect('/');
+                                	}
+                                });
+                            }
+                            });
+
+                            router.get('/forgetpass', function (req, res, next) {
+                            	res.render("forget.ejs");
+                            });
+
+                            router.post('/forgetpass', function (req, res, next) {
+                            	//console.log('req.body');
+                            	//console.log(req.body);
+                            	User.findOne({email:req.body.email},function(err,data){
+                            		console.log(data);
+                            		if(!data){
+                            			res.send({"Success":"This Email Is not regestered!"});
+                            		}else{
+                            			// res.send({"Success":"Success!"});
+                            			if (req.body.password==req.body.passwordConf) {
+                            			data.password=req.body.password;
+                            			data.passwordConf=req.body.passwordConf;
+
+                            			data.save(function(err, Person){
+                            				if(err)
+                            					console.log(err);
+                            				else
+                            					console.log('Success');
+                            					res.send({"Success":"Password changed!"});
+                            			});
+                            		}else{
+                            			res.send({"Success":"Password does not matched! Both Password should be same."});
+                            		}
+                            		}
+                            	});
+
+                            });
+
+
+
+
+
+                            router.post('/submitScore', function(req, res, next) {
+                            	var pScore = req.body;
+                            console.log(JSON.stringify(req.body));
+                            			User.findOne({unique_id:req.session.userId},function(err,data){
+                            				console.log(data);
+                            				//if(!data){
+
+                            				const name = process.env.GAME_NAME;
+
+                            						var newScore = new Scores({
+                            							_id: new mongoose.Types.ObjectId(),
+                            							unique_id: data.unique_id,
+                            							username: data.username,
+                            							score: pScore.score,
+                            							location: {
+                            								city: pScore.city.toString(),
+                            								state: pScore.state.toString(),
+                            								country: pScore.country.toString()
+                            							},
+                            							game: {
+                            								game_name: name,
+                            								game_description: ""
+                            							}
+                            						});
+
+                            						newScore.save(function(err, userScores){
+                            							if(err)
+                            								console.log(err);
+                            							else
+                            							console.log("Successfully: submitted Score" + newScore);
+                            							//return res.redirect('/scoreboard');
+                            						});
+
+                            					res.send({"Success":"Your score was submitted"});
+
+
+                            			});
+                            });
+
+                            router.get('/2048', function (req, res, next) {
+                            	//res.sendFile(path.join(__dirname + '/2048-master/index.html'));
+                            	res.render("2048/2048.ejs");
+                            });
+
+                            router.get('/scoreboard', function (req, res, next) {
+
+                            	var loc = {};
+
+                            	Scores.findOne({unique_id:req.session.userId},function(err,data){
+                            		if(!data){
+                            			res.send({"Failure":"Oops! Thats not supposed to happen! Hang with us while we try to solve your problem."});
+                            		}else{
+                            			loc.city = data.location.city;
+                            			loc.state = data.location.state;
+                            			loc.country = data.location.country;
+                            		}
+                            	});
+                            	var bigBlob = {};
+                            	Scores.find({city: loc.city}).sort({score: -1}).limit(10).exec(function(err,cityData) {
+                            		bigBlob.cityData = cityData;
+                            			 });
+                            	Scores.find({state: loc.state}).sort({score: -1}).limit(10).exec(function(err,stateData) {
+                            		bigBlob.stateData = stateData;
+                            				});
+                            	Scores.find({country: loc.country}).sort({score: -1}).limit(10).exec(function(err,countryData) {
+                            		bigBlob.countryData = countryData
+                            			return res.render('scoreboard.ejs', {'cityData': bigBlob.cityData, 'stateData': bigBlob.stateData, 'countryData': bigBlob.countryData});
+                            			 	});
+                            });
+
+
+
+
+                            module.exports = router;
+
+
+
+
+
+
+                            router.post('/register', function(req, res, next) {
+                            	var personInfo = req.body;
+
+
+                            	if(!personInfo.email || !personInfo.username || !personInfo.password || !personInfo.phone){
+                            		res.send();
+                            	} else {
+                            		if (personInfo.password) {
+
+                            			User.findOne({email:personInfo.email},function(err,data){
+                            				if(err) throw err;
+                            				if(!data){
+                            					var c;
+                            					User.findOne({},function(err,data){
+
+                            						if (data) {
+                            							console.log("if");
+                            							c = data.unique_id + 1;
+                            						}else{
+                            							c=1;
+                            						}
+
+                            						var newPerson = new User({
+                            							unique_id:c,
+                            							email:personInfo.email,
+                            							username: personInfo.username,
+                            							//password: hash,
+                            							phone: personInfo.phone
+                            						});
+
+                            						bcrypt.hash(req.body.passwordsignup, saltRounds, function (err,   hash) {
+                            							console.log(hash);
+                             							User.create({
+                            								unique_id:c,
+                            								email:personInfo.email,
+                            								username: personInfo.username,
+                            								password: hash,
+                            								phone: personInfo.phone
+                               }).then(function(data) {
+                                if (data) {
+                                console.log(data);
+                                }
+                              });
+                             });
+
+
+                            					}).sort({_id: -1}).limit(1);
+                            					res.send({"Success":"You are regestered,You can login now."});
+                            				}else{
+                            					res.send({"Success":"Email is already used."});
+                            				}
+
+                            			});
+                            		}else{
+                            			res.send({"Success":"password is not matched"});
+                            		}
+                            	}
+                            });
+
+                            router.get('/login', function (req, res, next) {
+                            	return res.render('login.ejs');
+                            });
+
+                            router.post('/login', function (req, res, next) {
+                            	//console.log(req.body);
+                            	User.findOne({email:req.body.email},function(err,data){
+                            		if(data){
+
+                            			bcrypt.compare(req.body.password, data.password, function (err, result) {
+                            			        if (result == true) {
+                            								console.log(result);
+                            			            res.send({"Success":"Success!"});
+                            			        } else {
+                            			         res.send({"Success":"Wrong password!"});
+                            			        }
+                            			      });
+                            		}else{
+                            			res.send({"Success":"This Email Is not regestered!"});
+                            		}
+                            	});
+                            });
+
+                            router.get('/guest', function (req, res, next) {
+                            	return res.render('guest.ejs');
+                            });
+
+                            router.post('/guest', function(req, res, next) {
+                            	var guestInfo = req.body;
+
+                            	if(!guestInfo.guest){
+                            		res.send();
+                            	} else {
+
+                            			Guests.findOne({username:guestInfo.guest},function(err,data){
+                            				console.log(" " + guestInfo.guest)
+                            				if(!data){
+
+                            						var random_id           = '';
+                            				    var characters       = '0123456789';//'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                            				    var charactersLength = characters.length;
+                            				    for ( var i = 0; i < 15; i++ ) {
+                            				       random_id += characters.charAt(Math.floor(Math.random() * charactersLength));
+                            				    }
+
+                            						var newGuest = new Guests({
+                            							unique_id: random_id,
+                            							username: guestInfo.guest
+                            						});
+                            						newGuest.save(function(err, Person){
+                            							if(err)
+                            								console.log(err);
+                            							else
+                            							req.session.userId = newGuest.unique_id;
+                            								console.log('New Guest: ' + guestInfo.guest);
+                            								//return res.redirect('/2048');
+                            						});
+
+                            					res.send({"Success":"Success!"});
+                            				}else{
+                            					res.send({"Success":"There is already an account with that name."});
+                            				}
+
+                            			});
+                                  <!DOCTYPE html>
+                                  <html lang="en">
+                                  <head>
+                                    <title>Gamry</title>
+                                    <meta charset="utf-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+                                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+                                    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+                                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+                                    <script type="text/javascript">
+                                  		$(document).ready(function(){
+                                  			$( "#form1" ).submit(function(event) {
+                                  				event.preventDefault();
+                                  				$.ajax({
+                                  					type: 'POST',
+                                  					url: '/register',
+                                  					data: $('#form1').serialize(),
+                                  					dataType: "json",
+                                  					success: function(response){
+                                  						//alert("a");
+                                  						//console.log(response.Success);
+                                  						$('#form1')[0].reset();
+                                  						document.getElementById("check").innerHTML=response.Success;
+                                           					//ADD THIS CODE
+                                           					setTimeout(function(){
+                                           						document.getElementById("check").innerHTML="";
+                                           					},3000);
+                                           					if (response.Success=="You are regestered,You can login now.") {
+                                           						document.getElementById("aa").click();
+                                           					};
+                                           				},
+                                           				error: function() {
+                                           				}
+                                           			})
+                                  			});
+                                  		});
+                                  	</script>
+                                    <style>
+                                    body{
+                                      height: 100%;
+                                      font-family: ;/*courier garamond candara*/
+                                    }
+                                    .fa {
+                                    padding: 20px;
+                                    font-size: 24px;
+                                    width: ;
+                                    text-align: center;
+                                    text-decoration: none;
+                                    border-radius: 50%;
+                                    color: black;
+                                  }
+                                  .alignleft {
+                                      float: left;
+                                      margin-right: 15px;
+                                  }
+                                  .alignright {
+                                      float: right;
+                                      margin-left: 15px;
+                                  }
+                                  .aligncenter {
+                                      display: block;
+                                      margin: 0 auto 15px;
+                                  }
+                                  a:focus { outline: 0 solid }
+                                  img {
+                                      max-width: 100%;
+                                      height: auto;
+                                  }
+                                  .fix { overflow: hidden }
+                                  h1,
+                                  h2,
+                                  h3,
+                                  h4,
+                                  h5,
+                                  h6 {
+                                      margin: 0 0 15px;
+                                      font-weight: 700;
+                                  }
+                                  html,
+                                  body { height: 100% }
+
+                                  a {
+                                      -moz-transition: 0.3s;
+                                      -o-transition: 0.3s;
+                                      -webkit-transition: 0.3s;
+                                      transition: 0.3s;
+                                      color: #333;
+                                  }
+                                  a:hover { text-decoration: none }
+
+
+
+                                  .search-box{margin:80px auto;position:absolute;}
+                                  .caption{margin-bottom:50px;}
+                                  .loginForm input[type=text], .loginForm input[type=password]{
+                                  	margin-bottom:10px;
+                                  }
+                                  .loginForm input[type=submit]{
+                                  	background:#fb044a;
+                                  	color:#fff;
+                                  	font-weight:700;
+
+                                  }
+
+
+                                  #pswd_info {
+                                  	background: #dfdfdf none repeat scroll 0 0;
+                                  	color: #fff;
+                                  	left: 20px;
+                                  	position: absolute;
+                                  	top: 115px;
+                                  }
+                                  #pswd_info h4{
+                                      background: black none repeat scroll 0 0;
+                                      display: block;
+                                      font-size: 14px;
+                                      letter-spacing: 0;
+                                      padding: 17px 0;
+                                      text-align: center;
+                                      text-transform: uppercase;
+                                  }
+                                  #pswd_info ul {
+                                      list-style: outside none none;
+                                  }
+                                  #pswd_info ul li {
+                                     padding: 10px 45px;
+                                  }
+
+
+
+                                  .valid {
+                                  	background: rgba(0, 0, 0, 0) url("https://s19.postimg.org/vq43s2wib/valid.png") no-repeat scroll 2px 6px;
+                                  	color: green;
+                                  	line-height: 21px;
+                                  	padding-left: 22px;
+                                  }
+
+                                  .invalid {
+                                  	background: rgba(0, 0, 0, 0) url("https://s19.postimg.org/olmaj1p8z/invalid.png") no-repeat scroll 2px 6px;
+                                  	color: red;
+                                  	line-height: 21px;
+                                  	padding-left: 22px;
+                                  }
+
+
+                                  #pswd_info::before {
+                                      background: #dfdfdf none repeat scroll 0 0;
+                                      content: "";
+                                      height: 25px;
+                                      left: -13px;
+                                      margin-top: -12.5px;
+                                      position: absolute;
+                                      top: 50%;
+                                      transform: rotate(45deg);
+                                      width: 25px;
+                                  }
+                                  #pswd_info {
+                                      display:none;
+                                  }
+                                    </style>
+                                  </head>
+                                  <body>
+                                    <nav id = "navbarColo" class="navbar navbar-expand-lg navbar-light  navbar-fixed">
+                                      <a class="navbar-brand" href="#" style="font-family: garamond; border-bottom: medium solid black "><strong>Game</strong>ry</a>
+                                      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                                        <span class="navbar-toggler-icon"></span>
+                                      </button>
+                                      <div class="collapse navbar-collapse" id="navbarText">
+                                        <ul class="navbar-nav mr-auto">
+                                          <li class="nav-item active">
+                                            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                                          </li>
+                                          <li class="nav-item">
+                                            <a class="nav-link" href="/scoreboard">Leaderboards</a>
+                                          </li>
+                                          <li class="nav-item">
+                                            <a class="nav-link" href="/library">Library</a>
+                                          </li>
+                                        </ul>
+                                        <span class="navbar-text">
+                                          <a href="#" class="fa fa-facebook"></a>
+                                          <a href="#" class="fa fa-twitter"></a>
+                                          <a href="#" class="fa fa-instagram"></a>
+                                        </span>
+                                      </div>
+                                    </nav>
+
+                                    <div class="container h-100 col-sm-8" style="margin-top: 3%">
+                                      <h2 style="font-family: garamond">Register</h2>
+                                    	<hr>
+                                        <form id="form1" method="post" class="needs-validation h-100">
+                                          <div class="form-group">
+                                            <label for="email">Email:</label>
+                                            <input type="email" class="form-control" id="uname" placeholder="Ex: gamry@email.com" name="email" required>
+                                            <div class="valid-feedback">Valid.</div>
+                                            <div class="invalid-feedback">Please fill out this field.</div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="password">Phone:</label>
+                                            <input type="number" class="form-control" id="pwd" placeholder="+1-800-000-000" name="phone" required>
+                                            <div class="valid-feedback">Valid.</div>
+                                            <div class="invalid-feedback">Please fill out this field.</div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="email">Username:</label>
+                                            <input type="text" class="form-control" id="uname" minLength="4" maxlength="20" placeholder="Enter username" name="username" required>
+                                            <div class="valid-feedback">Valid.</div>
+                                            <div class="invalid-feedback">Please fill out this field.</div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="password">Password:</label>
+                                            <input type="password" class="form-control" id="pwd" minLength="6" maxlength="20" placeholder="Enter password" name="password" required>
+                                            <div class="valid-feedback">Valid.</div>
+                                            <div class="invalid-feedback">Please fill out this field.</div>
+                                          </div>
+                                          <div class="form-group form-check">
+                                          <div class="row">
+                                        </div>
+                                          <div class="row">
+                                            <div class="col-md- mx-auto">
+                                          <button type="submit" value="Login" class="btn btn-outline-dark">Register</button>
+                                        </div>
+                                        </div>
+                                        </form>
+
+                                        <!DOCTYPE html>
+                                        <html lang="en">
+                                        <head>
+                                          <title>Gamry</title>
+                                          <meta charset="utf-8">
+                                          <meta name="viewport" content="width=device-width, initial-scale=1">
+                                          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+                                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                                          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+                                          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+                                          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+                                        	<script type="text/javascript">
+                                        		$(document).ready(function(){
+
+                                        			$( "#form4" ).submit(function(event) {
+                                        				event.preventDefault();
+
+                                        				$.ajax({
+                                        					type: 'POST',
+                                        					url: '/welcome',
+                                        					data: $('#form4').serialize(),
+                                        					dataType: "json",
+                                        					success: function(response){
+                                        						//alert("a");
+                                        						//console.log(response.Success);
+                                        						$('#form4')[0].reset();
+
+                                        						document.getElementById("check").innerHTML=response.Success;
+                                                 					//ADD THIS CODE
+                                                 					setTimeout(function(){
+                                                 						document.getElementById("check").innerHTML="";
+                                                 					},3000);
+                                                 					if (response.Success=="Success!") {
+                                                 						document.getElementById("aa").click();
+                                                 					};
+                                                 				},
+                                                 				error: function() {
+                                                 				}
+                                                 			})
+                                        			});
+
+                                        		});
+                                        	</script>
+                                          <style>
+                                          body{
+                                            height: 100%;
+                                            font-family: ;/*courier garamond candara*/
+                                          }
+                                          .fa {
+                                          padding: 20px;
+                                          font-size: 24px;
+                                          width: ;
+                                          text-align: center;
+                                          text-decoration: none;
+                                          border-radius: 50%;
+                                          color: black;
+                                        }
+                                        	#navbarColor {
+                                        		background-attachment: fixed;
+                                        		background: -webkit-gradient(linear, left top, right top, from(#7b4397), to(#dc2430)) fixed;
+                                        }
+                                        .wrapper {
+                                          padding-top: 60px;
+                                        	width: 100%;
+                                        	background-color: ;
+                                        	height: 50%
+                                        }
+
+                                        .main-container {
+                                          background: ;
+                                          position: relative;
+                                          color: #FFFFFF;
+                                        }
+
+                                        .main-container:before {
+                                          content: '';
+                                          position: absolute;
+                                          left: 0;
+                                          top: -36px;
+                                          width: 100%;
+                                          height: 72px;
+                                          background: black;
+                                          -webkit-transform: skewY(2.5deg);
+                                          -moz-transform: skewY(2.5deg);
+                                          -ms-transform: skewY(2.5deg);
+                                          -o-transform: skewY(2.5deg);
+                                          transform: skewY(2.5deg);
+                                          -webkit-backface-visibility: hidden;
+                                        }
+
+                                        section {
+                                          margin: 10px 0;
+                                          padding: 0 20px;
+                                          padding-bottom: 10px;
+                                          position: relative;
+                                        }
+                                        	</style>
+                                        </head>
+                                        <nav id = "navbarColo" class="navbar navbar-expand-lg navbar-light  navbar-fixed">
+                                          <a class="navbar-brand" href="#" style="font-family: garamond; border-bottom: medium solid black "><strong>Game</strong>ry</a>
+                                          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                                            <span class="navbar-toggler-icon"></span>
+                                          </button>
+                                          <div class="collapse navbar-collapse" id="navbarText">
+                                            <ul class="navbar-nav mr-auto">
+                                          		<li class="nav-item active">
+                                          			<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                                          		</li>
+                                          		<li class="nav-item">
+                                          			<a class="nav-link" href="/scoreboard">Leaderboards</a>
+                                          		</li>
+                                          		<li class="nav-item">
+                                          			<a class="nav-link" href="/library">Library</a>
+                                          		</li>
+                                          	</ul>
+                                            <span class="navbar-text">
+                                              <a href="#" class="fa fa-facebook"></a>
+                                              <a href="#" class="fa fa-twitter"></a>
+                                              <a href="#" class="fa fa-instagram"></a>
+                                            </span>
+                                          </div>
+                                        </nav>
+                                        <!--
+                                        <div class="wrapper">
+
+                                          <main class="main">
+                                            <div class="main-container">
+                                              <section>
+                                              </section>
+                                              </div>
+                                            </main>-->
+
+                                              </div>
+                                        <div class="container h-100 col-sm-8" style="margin-top: 3%">
+                                          <h2 class="mx-auto center" style="font-family: garamond">Welcome!</h2>
+                                        	<hr>
+                                          <div class="text-center"><em>To help us better your experience, consider submitting your phone number for text alerts and game notifications</em></div>
+                                        <form id="form4" method="post" class="needs-validation">
+                                          <div class="form-group">
+                                            <label for="email">Phone Number:</label><i class="fa fa-phone"></i>
+                                            <input type="text" class="form-control" id="uname" placeholder="Ex: 1-800-000-000" name="phone" required>
+                                            <div class="valid-feedback">Valid.</div>
+                                            <div class="invalid-feedback">Please fill out this field.</div>
+                                          </div>
+                                            </label>
+                                            <div class="row">
+                                          </div>
+                                          <div class="row">
+                                            <div class="col-md- mx-auto">
+                                          <button type="submit" value="Login" class="btn btn-outline-dark">Submit</button>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </form>
+                                        <div class="mssg bg-danger">
+                                        	<span id="check" ></span>
+                                        </div>
+                                        <div id="LangTable"><a href="/login" id="aa"></a>
+                                        	<script>
+                                        // Disable form submissions if there are invalid fields
+                                        (function() {
+                                          'use strict';
+                                          window.addEventListener('load', function() {
+                                            // Get the forms we want to add validation styles to
+                                            var forms = document.getElementsByClassName('needs-validation');
+                                            // Loop over them and prevent submission
+                                            var validation = Array.prototype.filter.call(forms, function(form) {
+                                              form.addEventListener('submit', function(event) {
+                                                if (form.checkValidity() === false) {
+                                                  event.preventDefault();
+                                                  event.stopPropagation();
+                                                }
+                                                form.classList.add('was-validated');
+                                              }, false);
+                                            });
+                                          }, false);
+                                        })();
+                                        </script>
+                                        </div>
+                                        </div>
+                                        <!-- Footer -->
+                                        <footer class="page-footer font-small cyan darken-3">
+
+
+                                          <!-- Copyright -->
+                                          <div class="footer-copyright text-center py-3">
+                                            <hr class="w-25">
+                                            <div class="footer-copyright text-center py-3">Skip this step?
+                                              <a href="/login" style="color: black"><strong>click here</strong></a>
+                                            </div>
+                                          </div>
+                                          <!-- Copyright -->
+
+                                        </footer>
+                                        <!-- Footer -->
+                                        </body>
+                                        </html>
