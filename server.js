@@ -33,7 +33,7 @@ const saltRounds = 10;
 
 require("dotenv").config();
 
-mongoose.connect('mongodb+srv://dbJoshAdmin:*Germanium7*@gamry-ary4d.mongodb.net/gamry');
+mongoose.connect('mongodb+srv://dbJoshAdmin:*Germanium7*@gamry-ary4d.mongodb.net/test?authSource=admin&replicaSet=gamry-shard-0&readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=true');
 //'mongodb://127.0.0.1:27017/gamry');
 //'mongodb+srv://dbJoshAdmin:*Germanium7*@gamry-ary4d.mongodb.net/gamry');
 var db = mongoose.connection;
