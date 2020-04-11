@@ -6,7 +6,7 @@ var xss = require('xss-clean');
 var ejs = require('ejs');
 var path = require('path');
 var app = express();
-app.use(helmet());
+app.use(helmet.noCache())
 // Data Sanitization against XSS
 
 const limit = rateLimit({
@@ -33,20 +33,28 @@ const saltRounds = 10;
 
 require("dotenv").config();
 
-mongoose.connect('mongodb://joshAdmin:*Germanium7*@localhost:27017/gamry');
-
+mongoose.connect('mongodb+srv://dbJoshAdmin:*Germanium7*@gamry-ary4d.mongodb.net/gamry');
+//'mongodb://127.0.0.1:27017/gamry');
+//'mongodb+srv://dbJoshAdmin:*Germanium7*@gamry-ary4d.mongodb.net/gamry');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
 });
 
 app.use(session({
-  name: 'sessionId',
-  secret: 'J1aRp',
+  secret: ['ST9iSuSp7/Mikx5LcslWTzsyJIs=','HJzn/3ExRH51F1jnF3L/BjBPS6o=','YRzkxDviYAi12HnNct7fMpUn4RE='],
+    name: "secretname",
   resave: true,
+  cookie: {
+      httpOnly: true,
+      //secure: true,
+      sameSite: true,
+      maxAge: 600000 // Time is in miliseconds
+  },
   saveUninitialized: false,
   store: new MongoStore({
-    mongooseConnection: db
+    mongooseConnection: db,
+    ttl: (1 * 60 * 60)
   })
 }));
 

@@ -46,12 +46,13 @@ router.post('/register', function(req, res, next) {
 	var personInfo = req.body;
 
 
-	if(!personInfo.email || !personInfo.username || !personInfo.password || !personInfo.phone){
+	if(!personInfo.email || !personInfo.username || !personInfo.password){
 		res.send();
 	} else {
 		if (personInfo.password) {
+			console.log(personInfo.username);
 
-			User.findOne({email:personInfo.email},function(err,data){
+			User.findOne({$or:[{email: personInfo.email},{username: personInfo.username}]},function(err,data){
 				if(err) throw err;
 				if(!data){
 					var c;
@@ -79,26 +80,20 @@ router.post('/register', function(req, res, next) {
 								password: personInfo.password,
 								phone: personInfo.phone
    }).then(function(data) {
-    if (data) {
-			ssn = req.session;
-			ssn.tempId = newPerson.unique_id;
-			hope(newPerson.unique_id);
-			req.session.save(function (err) {
-				if (err) {
-					return next(err);
-				} else {
-					console.log('mula');
+		 if (err) {
+				return next(err);
+			} else {
+				if (data) {
+					console.log("New user: " + data);
 				}
-			});
-    console.log(req.session.tempId);
-    }
+			}
   });
 
 
 					}).sort({_id: -1}).limit(1);
 					res.send({"Success":"You are regestered,You can login now."});
 				}else{
-					res.send({"Success":"Email is already used."});
+					res.send({"Success":"Email or username is already used."});
 				}
 
 			});
@@ -110,43 +105,6 @@ router.post('/register', function(req, res, next) {
 
 router.get('/welcome', function (req, res, next) {
 	return res.render('welcome.ejs');
-});
-
-router.post('/welcome', function(req, res, next) {
-	var test;
-	function hope(id){
-		test = id;
-	}
-	console.log("test" + test);
-	ssn = req.session;
-	var phoneInfo = req.body;
-	console.log(phoneInfo.phone);
-
-	if(!phoneInfo){
-		res.send();
-	} else {
-
-		var query = {'unique_id': ssn.tempId};
-		//req.newData.username = req.user.username;
-		console.log(ssn.tempId);
-
-		User.updateOne(query, {'phone': phoneInfo.phone}, {upsert: false}, function (err, result) {
-			if(err) console.log(err);
-			if(result){
-				console.log(result)
-				console.log(result);
-			}else{
-				console.log("failure");
-			}
-		});
-		req.session.destroy(function (err) {
-			if (err) {
-				return next(err);
-			} else {
-				return res.redirect('/login');
-			}
-		});
-}
 });
 
 router.get('/login', function (req, res, next) {
@@ -363,7 +321,7 @@ router.get('/scoreboard', function (req, res, next) {
 
 	Scores.findOne({unique_id:req.session.userId},function(err,data){
 		if(!data){
-			res.send({"Failure":"Oops! Thats not supposed to happen! Hang with us while we try to solve your problem."});
+			//res.send({"Failure":"Oops! Thats not supposed to happen! Hang with us while we try to solve your problem."});
 		}else{
 			loc.city = data.location.city;
 			loc.state = data.location.state;
