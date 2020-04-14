@@ -33,7 +33,7 @@ const saltRounds = 10;
 
 require("dotenv").config();
 
-mongoose.connect('mongodb+srv://dbJoshAdmin:*Germanium7*@gamry-ary4d.mongodb.net/gamry');
+mongoose.connect(process.env.MONGODB_URI);
   //'mongodb://heroku_p5lsv268:r0drvdvjl9u6crbeq76j6tbu32@ds223161.mlab.com:23161/heroku_p5lsv268');
 //'mongodb://127.0.0.1:27017/gamry');
 //'mongodb+srv://dbJoshAdmin:@gamry-ary4d.mongodb.net/gamry');
