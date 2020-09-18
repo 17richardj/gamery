@@ -1,6 +1,6 @@
-# Node.js-Register-Login-App
+# Gamery
 
-This is a user login and registration app using Node.js, Express, Mongoose and express-sessions.
+Node.js powered, bcrypt secured. A native web app with responsive UI design enabling users to compete against eachother in their favorite games, daily. User scores are compared to their competitors by location. Users can compete to be the best in their city, state, country, or the world. Every day new games appear. 
 
 ## Getting Started
 
@@ -22,6 +22,7 @@ nodemon server.js
 
 Code is Running on 
 + http://localhost:3000/
+or any other specified port
 
 :heart_eyes: Thanks
 
