@@ -5,7 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "atom": "^1.4.1",
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "connect-mongo": "^3.0.0",
     "dotenv": "^8.2.0",
     "ejs": "^3.0.1",
